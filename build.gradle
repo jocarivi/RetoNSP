@@ -1,0 +1,62 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.serenity-bdd:serenity-gradle-plugin:4.0.12"
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: "net.serenity-bdd.serenity-gradle-plugin"
+
+sourceCompatibility = 17
+targetCompatibility = 17
+
+group = 'com.nespon'
+version = '1.0-SNAPSHOT'
+
+ext {
+    serenity_version = "4.0.12"
+    junit_version = "4.13.2"
+    slf4j_version = "2.0.6"
+}
+
+dependencies {
+    implementation "net.serenity-bdd:serenity-core:${serenity_version}"
+    implementation "net.serenity-bdd:serenity-junit:${serenity_version}"
+    implementation "net.serenity-bdd:serenity-screenplay:${serenity_version}"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:${serenity_version}"
+    implementation "net.serenity-bdd:serenity-ensure:${serenity_version}"
+    testImplementation "net.serenity-bdd:serenity-cucumber:${serenity_version}"
+    testImplementation "junit:junit:${junit_version}"
+    testImplementation "org.slf4j:slf4j-simple:${slf4j_version}"
+}
+
+test {
+    systemProperties System.getProperties()
+    systemProperty "file.encoding", "UTF-8"
+    systemProperty "feature.file.encoding", "UTF-8"
+    systemProperty "cucumber.options", System.properties.getProperty("cucumber.options")
+    testLogging.showStandardStreams = true
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+gradle.startParameter.continueOnFailure = true
+
+
+defaultTasks 'clean', 'test', 'aggregate'
+
+test.finalizedBy('aggregate')
